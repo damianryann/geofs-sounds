@@ -1,14 +1,21 @@
-// Autopilot Disconnect Sound
-let autopilotDisconnectSound = new Audio(
+/**
+ * Autopilot Disconnect Sound
+ **/
+const autopilotDisconnectSound = new Audio(
   "https://raw.githubusercontent.com/Ariakim-Taiyo/GeoFs-737-Immersion-SFX/main/737_autopilot_disconnect.mp3"
 );
 
-geofs.autopilot._turnOff = geofs.autopilot.turnOff; // duplicate the original
+// duplicate the original
+geofs.autopilot._turnOff = geofs.autopilot.turnOff;
 geofs.autopilot.turnOff = () => {
   // override the original function
   geofs.autopilot._turnOff();
   if (audio.on && !geofs.pause) autopilotDisconnectSound.play();
 };
+
+/**
+ * Altitude Callouts Sounds
+ **/
 
 // Define sounds in a separate object
 const soundFiles = {
@@ -85,130 +92,69 @@ function doRadioAltCall() {
         console.log(
           `Triggering sound for ${alt.value} at altitude ${geofs.animation.values.haglFeet}`
         );
-        playSoundIfLoaded(soundFiles[alt.value]); // Play sound dynamically
+
+        // Play sound dynamically
+        playSoundIfLoaded(soundFiles[alt.value]);
       }
     });
   }
-}
-
-// TCAS Logic - Play sound if TCAS is active
-function checkTCAS() {
-  if (geofs.animation.values.isTCAS) {
-    playSoundIfLoaded(soundFiles.tcas); // Play TCAS traffic sound if active
-  }
-}
-
-// Flaps Sound Logic
-let lastFlapPos = -1;
-function getFlapsSound() {
-  if (
-    geofs.camera.currentModeName === "Left wing" ||
-    geofs.camera.currentModeName === "Right wing"
-  ) {
-    if (geofs.animation.values.flapsPosition !== lastFlapPos) {
-      geofs.animation.values.flapsSound = 1;
-    } else {
-      geofs.animation.values.flapsSound = 0;
-    }
-  } else {
-    geofs.animation.values.flapsSound = 0;
-  }
-  lastFlapPos = geofs.animation.values.flapsPosition;
 }
 
 // GPWS Variables
 let isApprConfig = false;
 geofs.animation.values.isGearWarn = 0;
 geofs.animation.values.isFlapsWarn = 0;
-geofs.animation.values.isTerrainWarn = 0;
-
-// GPWS Warning Logic
-function getGearFlapsWarn() {
-  // Reset warnings if aircraft is on the ground
-  if (geofs.animation.values.groundContact === 1) {
-    geofs.animation.values.isGearWarn = 0;
-    geofs.animation.values.isFlapsWarn = 0;
-    return;
-  }
-  // Gear Warning: Below 500 feet, gear should be down during descent
-  if (
-    geofs.animation.values.haglFeet <= 500 &&
-    geofs.animation.values.gearPosition === 0 && // 0 indicates gear up
-    geofs.animation.values.climbrate < 0
-  ) {
-    geofs.animation.values.isGearWarn = 1;
-  } else {
-    geofs.animation.values.isGearWarn = 0;
-  }
-
-  // Flaps Warning: Below 1000 feet, flaps should be deployed during descent
-  if (
-    geofs.animation.values.haglFeet <= 1000 &&
-    geofs.animation.values.flapsPosition === 0 && // 0 indicates flaps retracted
-    geofs.animation.values.climbrate < 0
-  ) {
-    geofs.animation.values.isFlapsWarn = 1;
-  } else {
-    geofs.animation.values.isFlapsWarn = 0;
-  }
-}
-
-function testTerrainorAppr() {
-  if (geofs.animation.values.gearPosition === 0) {
-    if (
-      geofs.animation.values.haglFeet <= 1000 &&
-      geofs.animation.values.climbrate <= -100 &&
-      geofs.animation.values.climbrate >= -5000 &&
-      geofs.animation.values.isGearWarn === 0 &&
-      geofs.animation.values.isFlapsWarn === 0
-    ) {
-      geofs.animation.values.isTerrainWarn = 1;
-    } else {
-      geofs.animation.values.isTerrainWarn = 0;
-    }
-
-    if (
-      geofs.animation.values.haglFeet <= 5000 &&
-      geofs.animation.values.climbrate <= -2000
-    ) {
-      geofs.animation.values.isPullupWarn = 1;
-    } else {
-      geofs.animation.values.isPullupWarn = 0;
-    }
-  } else {
-    geofs.animation.values.isTerrainWarn = 0;
-    geofs.animation.values.isPullupWarn = 0;
-  }
-}
 
 function testForApproach() {
-  console.log("Testing for Approach Configuration...");
-
   // Check if flaps warning is 0 and gear warning is 0
   if (
     geofs.animation.values.isFlapsWarn === 0 &&
     geofs.animation.values.isGearWarn === 0 &&
     geofs.animation.values.climbrate <= -1 // Descent condition
   ) {
-    console.log("Conditions met for approach config.");
     isApprConfig = true;
   } else {
-    console.log("Conditions NOT met for approach config.");
     isApprConfig = false;
   }
-
-  // Additional checks for altitude could be included here if needed
-  if (geofs.animation.values.haglFeet < 5000) {
-    console.log("Altitude is below 5000ft.");
-  }
 }
+
+/**
+ * Seatbelt Sound Toggle
+ **/
+const seatbeltOnSound = new Audio(
+  "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/misc/seatbelt-on.mp3"
+);
+const seatbeltOffSound = new Audio(
+  "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/misc/seatbelt-off.mp3"
+);
+
+let isSeatbeltOn = false; // Seatbelt sign is off by default
+
+// Event listener to detect Shift + S key press
+document.addEventListener("keydown", function (event) {
+  // Check if Shift key and S key are pressed
+  if (event.shiftKey && event.key === "S") {
+    // Toggle seatbelt state
+    isSeatbeltOn = !isSeatbeltOn;
+
+    // Play the corresponding sound based on the seatbelt state
+    if (isSeatbeltOn) {
+      if (audio.on && !geofs.pause) {
+        seatbeltOnSound.play();
+        console.log("Seatbelt sign ON, sound played.");
+      }
+    } else {
+      if (audio.on && !geofs.pause) {
+        seatbeltOffSound.play();
+        console.log("Seatbelt sign OFF, sound played.");
+      }
+    }
+  }
+});
 
 // Main Sound Interval - Trigger conditions for sounds
 setInterval(function () {
   getGearFlapsWarn();
   testForApproach();
-  testTerrainorAppr();
   doRadioAltCall();
-  checkTCAS();
-  getFlapsSound();
 }, 10);
