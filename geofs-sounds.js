@@ -1,8 +1,23 @@
+let aircraft = null;
+let aircraftName = geofs.aircraft.instance.aircraftRecord.name.toLowerCase();
+
+if (aircraftName.includes("boeing")) {
+  aircraft = "boeing";
+} else if (aircraftName.includes("airbus")) {
+  aircraft = "airbus";
+} else {
+  console.log(
+    "The aircraft is neither a Boeing nor an Airbus. Sounds will not execute."
+  );
+  // Exit the script if the aircraft is not Boeing or Airbus
+  return;
+}
+
 /**
  * Autopilot Disconnect Sound
  **/
 const autopilotDisconnectSound = new Audio(
-  "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/misc/autopilot-disconnect.mp3"
+  `https://raw.githubusercontent.com/damianryann/geofs-sounds/master/${aircraft}/autopilot-disconnect.mp3`
 );
 
 // duplicate the original
@@ -18,7 +33,7 @@ geofs.autopilot.turnOff = () => {
  **/
 
 // Define sounds in a separate object
-const soundFiles = {
+const boeingSoundFiles = {
   gpws1000: new Audio(
     "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/1000.mp3"
   ),
@@ -52,8 +67,29 @@ const soundFiles = {
   gpws10: new Audio(
     "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/10.mp3"
   ),
-  tcas: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/traffic.mp3"
+};
+
+const airbusSoundFiles = {
+  gpws400: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/400.wav"
+  ),
+  gpws300: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/300.wav"
+  ),
+  gpws200: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/200.wav"
+  ),
+  gpws100: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/100.wav"
+  ),
+  gpws50: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/50.wav"
+  ),
+  gpws30: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/30.wav"
+  ),
+  gpws20: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/20.wav"
   ),
 };
 
@@ -68,7 +104,7 @@ function playSoundIfLoaded(sound) {
 
 // GPWS & TCAS Logic - Play sound based on altitude thresholds
 function doRadioAltCall() {
-  const altitudes = [
+  const boeingAltitudes = [
     { value: "gpws1000", range: [900, 1000] },
     { value: "gpws500", range: [400, 500] },
     { value: "gpws400", range: [300, 400] },
@@ -82,9 +118,19 @@ function doRadioAltCall() {
     { value: "gpws10", range: [5, 10] },
   ];
 
+  const airbusAltitudes = [
+    { value: "gpws400", range: [300, 400] },
+    { value: "gpws300", range: [200, 300] },
+    { value: "gpws200", range: [100, 200] },
+    { value: "gpws100", range: [50, 100] },
+    { value: "gpws50", range: [40, 50] },
+    { value: "gpws30", range: [20, 30] },
+    { value: "gpws20", range: [10, 20] },
+  ];
+
   // Check if in approach configuration
-  if (isApprConfig) {
-    altitudes.forEach((alt) => {
+  if (isApprConfig && aircraft === "boeing") {
+    boeingAltitudes.forEach((alt) => {
       if (
         geofs.animation.values.haglFeet >= alt.range[0] &&
         geofs.animation.values.haglFeet <= alt.range[1]
@@ -94,7 +140,23 @@ function doRadioAltCall() {
         );
 
         // Play sound dynamically
-        playSoundIfLoaded(soundFiles[alt.value]);
+        playSoundIfLoaded(boeingSoundFiles[alt.value]);
+      }
+    });
+  }
+
+  if (isApprConfig && aircraft === "airbus") {
+    airbusAltitudes.forEach((alt) => {
+      if (
+        geofs.animation.values.haglFeet >= alt.range[0] &&
+        geofs.animation.values.haglFeet <= alt.range[1]
+      ) {
+        console.log(
+          `Triggering sound for ${alt.value} at altitude ${geofs.animation.values.haglFeet}`
+        );
+
+        // Play sound dynamically
+        playSoundIfLoaded(airbusSoundFiles[alt.value]);
       }
     });
   }
