@@ -9,8 +9,6 @@ if (aircraftName.includes("boeing")) {
   console.log(
     "The aircraft is neither a Boeing nor an Airbus. Sounds will not execute."
   );
-  // Exit the script if the aircraft is not Boeing or Airbus
-  return;
 }
 
 /**
@@ -71,25 +69,25 @@ const boeingSoundFiles = {
 
 const airbusSoundFiles = {
   gpws400: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/400.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/400.mp3"
   ),
   gpws300: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/300.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/300.mp3"
   ),
   gpws200: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/200.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/200.mp3"
   ),
   gpws100: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/100.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/100.mp3"
   ),
   gpws50: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/50.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/50.mp3"
   ),
   gpws30: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/30.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/30.mp3"
   ),
   gpws20: new Audio(
-    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/20.wav"
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/airbus/20.mp3"
   ),
 };
 
@@ -217,7 +215,6 @@ document.addEventListener("keydown", function (event) {
 
 // Main Sound Interval - Trigger conditions for sounds
 setInterval(function () {
-  getGearFlapsWarn();
   testForApproach();
   doRadioAltCall();
 }, 10);
