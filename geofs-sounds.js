@@ -2,7 +2,7 @@
  * Autopilot Disconnect Sound
  **/
 const autopilotDisconnectSound = new Audio(
-  "https://raw.githubusercontent.com/Ariakim-Taiyo/GeoFs-737-Immersion-SFX/main/737_autopilot_disconnect.mp3"
+  "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/misc/autopilot-disconnect.mp3"
 );
 
 // duplicate the original
@@ -128,12 +128,13 @@ const seatbeltOffSound = new Audio(
   "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/misc/seatbelt-off.mp3"
 );
 
-let isSeatbeltOn = false; // Seatbelt sign is off by default
+// Seatbelt sign is off by default
+let isSeatbeltOn = false;
 
-// Event listener to detect Shift + S key press
+// Event listener to detect Shift + Q key press
 document.addEventListener("keydown", function (event) {
   // Check if Shift key and S key are pressed
-  if (event.shiftKey && event.key === "S") {
+  if (event.shiftKey && event.key === "Q") {
     // Toggle seatbelt state
     isSeatbeltOn = !isSeatbeltOn;
 
