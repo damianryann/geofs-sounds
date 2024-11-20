@@ -1,15 +1,34 @@
 let aircraft = null;
-let aircraftName = geofs.aircraft.instance.aircraftRecord.name.toLowerCase();
 
-if (aircraftName.includes("boeing")) {
-  aircraft = "boeing";
-} else if (aircraftName.includes("airbus")) {
-  aircraft = "airbus";
-} else {
+// Function to determine aircraft type
+function checkAircraftType() {
+  let aircraftName = geofs.aircraft.instance.aircraftRecord.name.toLowerCase();
+  if (aircraftName.includes("boeing")) {
+    aircraft = "boeing";
+  } else if (aircraftName.includes("airbus")) {
+    aircraft = "airbus";
+  } else {
+    aircraft = null;
+  }
+  return aircraft;
+}
+
+// Initial check
+if (!checkAircraftType()) {
   console.log(
     "The aircraft is neither a Boeing nor an Airbus. Sounds will not execute."
   );
 }
+
+// Recheck every 1000 ms
+const aircraftCheckInterval = setInterval(() => {
+  if (!checkAircraftType()) {
+    console.log(
+      "The aircraft is no longer a Boeing or Airbus. Stopping all sounds."
+    );
+    clearInterval(aircraftCheckInterval);
+  }
+}, 1000);
 
 /**
  * Autopilot Disconnect Sound
@@ -65,6 +84,12 @@ const boeingSoundFiles = {
   gpws10: new Audio(
     "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/10.mp3"
   ),
+  appMin: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/appmin.mp3"
+  ),
+  min: new Audio(
+    "https://raw.githubusercontent.com/damianryann/geofs-sounds/master/boeing/min.mp3"
+  ),
 };
 
 const airbusSoundFiles = {
@@ -107,13 +132,15 @@ function doRadioAltCall() {
     { value: "gpws500", range: [400, 500] },
     { value: "gpws400", range: [300, 400] },
     { value: "gpws300", range: [200, 300] },
+    { value: "appMin", range: [200, 250] },
     { value: "gpws200", range: [100, 200] },
     { value: "gpws100", range: [50, 100] },
+    { value: "min", range: [50, 80] },
     { value: "gpws50", range: [40, 50] },
     { value: "gpws40", range: [30, 40] },
-    { value: "gpws30", range: [20, 30] },
-    { value: "gpws20", range: [10, 20] },
-    { value: "gpws10", range: [5, 10] },
+    { value: "gpws30", range: [25, 30] },
+    { value: "gpws20", range: [20, 25] },
+    { value: "gpws10", range: [5, 20] },
   ];
 
   const airbusAltitudes = [
@@ -133,10 +160,6 @@ function doRadioAltCall() {
         geofs.animation.values.haglFeet >= alt.range[0] &&
         geofs.animation.values.haglFeet <= alt.range[1]
       ) {
-        console.log(
-          `Triggering sound for ${alt.value} at altitude ${geofs.animation.values.haglFeet}`
-        );
-
         // Play sound dynamically
         playSoundIfLoaded(boeingSoundFiles[alt.value]);
       }
@@ -149,10 +172,6 @@ function doRadioAltCall() {
         geofs.animation.values.haglFeet >= alt.range[0] &&
         geofs.animation.values.haglFeet <= alt.range[1]
       ) {
-        console.log(
-          `Triggering sound for ${alt.value} at altitude ${geofs.animation.values.haglFeet}`
-        );
-
         // Play sound dynamically
         playSoundIfLoaded(airbusSoundFiles[alt.value]);
       }
@@ -217,4 +236,4 @@ document.addEventListener("keydown", function (event) {
 setInterval(function () {
   testForApproach();
   doRadioAltCall();
-}, 10);
+}, 100);
